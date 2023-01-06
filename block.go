@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/binary"
 	"log"
 	"time"
@@ -57,43 +56,52 @@ func NewBlock(prevBlockHash []byte, data string) *Block {
 		PrevHash:   prevBlockHash,
 		MerkelRoot: []byte{},
 		TimeStamp:  uint64(time.Now().Unix()),
+		Difficulty: 0,
+		Nonce:      0,
 		Hash:       []byte{}, // empty array
 		Data:       []byte(data),
 	}
 
-	block.calHash()
+	//block.calHash()
+	pow := NewProofOfWork(&block)
+	nonce, hash := pow.Run()
+
+	// 根据挖矿结果进行对区块数据进行更新
+	block.Hash = hash
+	block.Nonce = nonce
+
 	return &block
 
 }
 
 //3. 生成哈希 --
-
-func (block *Block) calHash() {
-	//var blockInfo []byte
-	/*
-		blockInfo = append(blockInfo, Uint64ToByte(block.Version)...)
-		blockInfo = append(blockInfo, block.PrevHash...)
-		blockInfo = append(blockInfo, block.MerkelRoot...)
-		blockInfo = append(blockInfo, Uint64ToByte(block.TimeStamp)...)
-		blockInfo = append(blockInfo, Uint64ToByte(block.Difficulty)...)
-		blockInfo = append(blockInfo, Uint64ToByte(block.Nonce)...)
-		blockInfo = append(blockInfo, block.Data...)
-	*/
-
-	temp := [][]byte{
-		Uint64ToByte(block.Version),
-		block.PrevHash,
-		block.MerkelRoot,
-		Uint64ToByte(block.TimeStamp),
-		Uint64ToByte(block.Difficulty),
-		Uint64ToByte(block.Nonce),
-		block.Data,
-	}
-	blockInfo := bytes.Join(temp, []byte{})
-	// 拼接所有数据
-	hash := sha256.Sum256(blockInfo)
-	block.Hash = hash[:]
-}
+//func (block *Block) calHash() {
+//	//var blockInfo []byte
+//	/*
+//		blockInfo = append(blockInfo, Uint64ToByte(block.Version)...)
+//		blockInfo = append(blockInfo, block.PrevHash...)
+//		blockInfo = append(blockInfo, block.MerkelRoot...)
+//		blockInfo = append(blockInfo, Uint64ToByte(block.TimeStamp)...)
+//		blockInfo = append(blockInfo, Uint64ToByte(block.Difficulty)...)
+//		blockInfo = append(blockInfo, Uint64ToByte(block.Nonce)...)
+//		blockInfo = append(blockInfo, block.Data...)
+//	*/
+//
+//	// 二维数组是什么？
+//	temp := [][]byte{
+//		Uint64ToByte(block.Version),
+//		block.PrevHash,
+//		block.MerkelRoot,
+//		Uint64ToByte(block.TimeStamp),
+//		Uint64ToByte(block.Difficulty),
+//		Uint64ToByte(block.Nonce),
+//		block.Data,
+//	}
+//	blockInfo := bytes.Join(temp, []byte{})
+//	// 拼接所有数据
+//	hash := sha256.Sum256(blockInfo)
+//	block.Hash = hash[:]
+//}
 
 // 实现一个辅助函数， 功能是将unit64转换成[]byte
 func Uint64ToByte(num uint64) []byte {

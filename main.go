@@ -5,9 +5,11 @@ import "fmt"
 // 升级版
 
 func main() {
+	//fmt.Println(len("000000100000000000000000000000000000000000000000000000000000000000"))
 	//block := NewBlock([]byte{}, "Bronson transfer Wendy 500 dollars")
 
 	chain := newBlockChain()
+
 	// 添加新区块
 	chain.addBlockToChain("Bronson Transfer Wendy 5000 Big butt coin")
 	chain.addBlockToChain("Bronson Transfer Wendy 10000 Big butt coin")
